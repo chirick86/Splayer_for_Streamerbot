@@ -30,6 +30,7 @@ Spotify helper scripts for Streamer.bot. It provides Spotify authorization, play
 
 ## Files
 
+- `Splayer.sb` - Streamer.bot string with all actions and settings.
 - `SplayerControl.html` - web control panel. (it is an example widget for OBS, you can use it as a web dock or modify it to your needs)
 - `SplayerWidget.html` - on-stream widget. (uses 3rd party Tuna plugin for OBS)
 - Place your `SplayerWidget.html` next to your `SpotArtist.txt` and `SpotTrack.txt` files that you use for your OBS Tuna plugin.
