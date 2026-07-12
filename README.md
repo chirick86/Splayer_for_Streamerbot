@@ -15,7 +15,7 @@ Spotify helper scripts for Streamer.bot. It provides Spotify authorization, play
 4. Copy your app `Client ID`, `Client Secret`, and `Redirect URI` into the form.
 5. for the Redirect URI, use `http://127.0.0.1:8080/callback` or any other URI you want, but it must match the one in your Spotify app settings. ![](guide/3.png)
 6. click the Spotify authorization button and confirm access.
-7. check checkboxes for the scopes you want to use.
+7. check checkboxes for the options you want to use.
 8. Close the form and you've done!
 
 ## Video guide:
