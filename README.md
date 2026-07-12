@@ -24,10 +24,9 @@ Spotify helper scripts for Streamer.bot. It provides Spotify authorization, play
 ## Usage
 
 - Use the control actions to play/pause, skip, and change volume.
-- Enable forced device if you want Spotify to play on a specific device.
-- Enable forced playlist if you want requests to go to a specific playlist.
+- Add requested songs to a playlist, queue or both using the Request Song action.
 - If you don't want adding songs to a playlist, you should disable sub-action (Add to Playlist) in the Request Song action.
-- Use the HTML files if you want the on-stream widget/control display.
+- Use the HTML files in OBS to display "Now Playing" song or control playback.
 
 ## Files
 
