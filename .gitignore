@@ -21,6 +21,10 @@ debug/
 *.png
 *.txt
 
+# Always include documentation assets from guide/
+!guide/
+!guide/**
+
 # Keep the root repo files if needed
 !.gitignore
 !README.md
