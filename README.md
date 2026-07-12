@@ -37,4 +37,4 @@ Spotify helper scripts for Streamer.bot. It provides Spotify authorization, play
 ## Notes
 
 - You should to enable WebSocket server in Streamer.bot settings to use SplayerControl. It configured to 127.0.0.1:8080 (default).
-- The first authorization may be needed before playlists and devices can load.
+- The first authorization needed before playlists and devices can load.
