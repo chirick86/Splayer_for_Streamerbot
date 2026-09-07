@@ -339,6 +339,8 @@
       volumeBadge.style.right = px(volumeRight);
       volumeBadge.style.fontSize = px(volumeFontSize);
       volumeBadge.style.textShadow = volumeTextShadow;
+
+      updateArtistWidthForVolume();
     }
 
     async function readTextFile(path) {
@@ -518,10 +520,29 @@
     function setVolumeText(percent) {
       const valueEl = document.getElementById("volumeValue");
       valueEl.textContent = `${percent}%`;
+      updateArtistWidthForVolume();
     }
 
     function setVolumeBadgeVisible(visible) {
       document.getElementById("volumeBadge").classList.toggle("visible", visible);
+      updateArtistWidthForVolume();
+    }
+
+    function updateArtistWidthForVolume() {
+      const artist = document.getElementById("artist");
+      const volumeBadge = document.getElementById("volumeBadge");
+
+      if (!volumeBadge.classList.contains("visible")) {
+        artist.style.width = "";
+        return;
+      }
+
+      const artistRect = artist.getBoundingClientRect();
+      const badgeRect = volumeBadge.getBoundingClientRect();
+      const gap = Math.round(12 * scale);
+      const available = Math.round(badgeRect.left - artistRect.left - gap);
+
+      artist.style.width = px(Math.max(0, available));
     }
 
     function findNamedGlobalValue(node, targetName) {
