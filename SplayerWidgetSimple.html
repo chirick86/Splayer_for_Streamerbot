@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Splayer Widget</title>
+  <title>Spoty Widget</title>
   <style>
     * {
       box-sizing: border-box;
@@ -173,25 +173,6 @@
       font-weight: 600;
       letter-spacing: 0;
     }
-
-    #widget>#volumeBadge {
-      position: absolute;
-      top: 14px;
-      right: 16px;
-      z-index: 5;
-      display: none;
-      align-items: center;
-      gap: 4px;
-      color: #ffffff;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      font-weight: 600;
-      white-space: nowrap;
-      pointer-events: none;
-    }
-
-    #widget>#volumeBadge.visible {
-      display: flex;
-    }
   </style>
 </head>
 
@@ -211,19 +192,9 @@
         <span class="push-text next"></span>
       </div>
     </div>
-    <div id="volumeBadge">
-      <span id="volumeIcon">🔉</span><span id="volumeValue"></span>
-    </div>
   </div>
 
   <script>
-    // =========================================
-    // CONFIG
-    // =========================================
-    const CONFIG = {
-      "vol-visible": true
-    };
-
     const scale = 1;
     const useBlurredBackdrop = true;
     const hidedWhenStopped = true;
@@ -232,10 +203,6 @@
     const ARTIST_FILE = "SpotArtist.txt";
     const TRACK_FILE = "SpotTrack.txt";
     const COVER_UPDATE_DELAY_MS = 900;
-
-    const VOLUME_WS_URL = "ws://127.0.0.1:8080/";
-    const GLOBAL_SVOLUME_VAR = "spotify.player.volume";
-    const VOLUME_POLL_MS = 1500;
 
     const BASE = {
       widgetWidth: 600,
@@ -253,11 +220,7 @@
       backgroundBlur: 10,
       textShadowOffsetX: 3,
       textShadowOffsetY: 3,
-      textShadowBlur: 3,
-      volumeFontSize: 22,
-      volumeTop: 14,
-      volumeRight: 16,
-      volumeShadowOffset: 1
+      textShadowBlur: 3
     };
 
     let lastArtist = "";
@@ -278,7 +241,6 @@
       const text = document.getElementById("text");
       const artist = document.getElementById("artist");
       const track = document.getElementById("track");
-      const volumeBadge = document.getElementById("volumeBadge");
 
       const widgetWidth = Math.round(BASE.widgetWidth * scale);
       const widgetHeight = Math.round(BASE.widgetHeight * scale);
@@ -328,17 +290,6 @@
       track.style.height = px(trackLineHeight + trackPaddingBottom);
       track.style.paddingBottom = px(trackPaddingBottom);
       track.style.textShadow = scaledTextShadow;
-
-      const volumeFontSize = Math.round(BASE.volumeFontSize * scale);
-      const volumeTop = Math.round(BASE.volumeTop * scale);
-      const volumeRight = Math.round(BASE.volumeRight * scale);
-      const volumeShadowOffset = Math.max(1, Math.round(BASE.volumeShadowOffset * scale));
-      const volumeTextShadow = `${volumeShadowOffset}px ${volumeShadowOffset}px ${volumeShadowOffset}px rgba(0, 0, 0, 0.85)`;
-
-      volumeBadge.style.top = px(volumeTop);
-      volumeBadge.style.right = px(volumeRight);
-      volumeBadge.style.fontSize = px(volumeFontSize);
-      volumeBadge.style.textShadow = volumeTextShadow;
     }
 
     async function readTextFile(path) {
@@ -515,106 +466,9 @@
       }
     }
 
-    function setVolumeText(percent) {
-      const valueEl = document.getElementById("volumeValue");
-      valueEl.textContent = `${percent}%`;
-    }
-
-    function setVolumeBadgeVisible(visible) {
-      document.getElementById("volumeBadge").classList.toggle("visible", visible);
-    }
-
-    function findNamedGlobalValue(node, targetName) {
-      if (!node || typeof node !== "object") return null;
-
-      if (Array.isArray(node)) {
-        for (const item of node) {
-          const nested = findNamedGlobalValue(item, targetName);
-          if (nested !== null) return nested;
-        }
-        return null;
-      }
-
-      if (typeof node.name === "string" && node.name.toLowerCase() === targetName.toLowerCase()) {
-        const num = Number(node.value);
-        if (Number.isFinite(num)) return num;
-      }
-
-      if (Object.prototype.hasOwnProperty.call(node, targetName)) {
-        const num = Number(node[targetName]);
-        if (Number.isFinite(num)) return num;
-      }
-
-      for (const key of Object.keys(node)) {
-        const nested = findNamedGlobalValue(node[key], targetName);
-        if (nested !== null) return nested;
-      }
-
-      return null;
-    }
-
-    function connectVolumeSocket() {
-      let ws;
-      let requestId = 1;
-      let pollTimer = null;
-
-      function requestVolume() {
-        if (!ws || ws.readyState !== WebSocket.OPEN) return;
-        ws.send(JSON.stringify({
-          request: "GetGlobals",
-          id: "vol-" + String(requestId++),
-          persisted: false
-        }));
-      }
-
-      function connect() {
-        ws = new WebSocket(VOLUME_WS_URL);
-
-        ws.addEventListener("open", () => {
-          setVolumeBadgeVisible(true);
-          requestVolume();
-          pollTimer = setInterval(requestVolume, VOLUME_POLL_MS);
-        });
-
-        ws.addEventListener("close", () => {
-          setVolumeBadgeVisible(false);
-          if (pollTimer) {
-            clearInterval(pollTimer);
-            pollTimer = null;
-          }
-          setTimeout(connect, 2000);
-        });
-
-        ws.addEventListener("error", () => {
-          ws.close();
-        });
-
-        ws.addEventListener("message", (event) => {
-          let msg;
-          try {
-            msg = JSON.parse(event.data);
-          } catch {
-            return;
-          }
-
-          const volume = findNamedGlobalValue(msg, GLOBAL_SVOLUME_VAR);
-          if (volume === null) return;
-
-          const clamped = Math.max(0, Math.min(100, Math.round(volume)));
-          setVolumeText(clamped);
-        });
-      }
-
-      connect();
-    }
-
     applyScale();
     updateWidget();
     setInterval(updateWidget, 1000);
-
-    if (CONFIG["vol-visible"]) {
-      connectVolumeSocket();
-    }
   </script>
 </body>
 
